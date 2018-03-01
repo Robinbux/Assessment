@@ -15,8 +15,9 @@
 //      ....        ##..        ....        ##..        ....        .#..
 //      ....        ....        ....        ....        ....        ....
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 typedef int bool;
 #define true 1
@@ -42,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     if (argc != 2)
     {
-        printf("Usage: ./fillit file\n");
+        write(1, "Usage: ./fillit file\n", 22);
         return 1;
     }
     
@@ -114,15 +115,21 @@ int main(int argc, char *argv[]) {
         counter--;
         tetPos--;
         
+        // Put the last piece one position to the right
         if(tetriminosXPos[tetPos] < (mapSize - 1)){
             xPos = (tetriminosXPos[tetPos] + 1);
             yPos = tetriminosYPos[tetPos];
             goto newXRun;
         }
+        
+        // If it was on the most right side possible, go one row down
         else if(tetriminosYPos[tetPos] < (mapSize - 1)){
             yPos = (tetriminosYPos[tetPos] + 1);
             goto newYRun;
         }
+        
+        // Current piece went to all possible positions and none was fitting,
+        // so the last piece needs a new position.
         else if(tetPos != 0){
             goto goPieceBack;
         }
@@ -250,7 +257,7 @@ int tetrimino(int *arr){
                 }
                 break;
         case 9: return 2; break;
-        default: printf("ERROR"); return 42; break;
+        default: write(1, "ERROR\n", 7);; return 42; break;
     }
     return 42;
 } 
@@ -590,17 +597,18 @@ void removeTet(int minSize, char map[][minSize], int tetPos){
 // Returns the number of blocks/tetriminos you have
 int getBlocks(char *file){
     
-    char c;
     int line = 0;
     int pos = 0;
     int blocks;
     
-    FILE *inptr = fopen(file, "rt");
-    
-    // Count the amount of blocks/tetriminos
-    while((c=fgetc(inptr))!=EOF){
-        
-        if(c == '.' || c == '#'){
+    char chr;
+    int fd = open(file, O_RDONLY);
+    if (fd == -1){
+        write(1, "Invalid file\n", 14);
+        return -1;
+    }
+    while (read(fd, &chr, 1) == 1) { 
+        if(chr == '.' || chr == '#'){
             pos++;
             if(pos == 4){
                 pos = 0;
@@ -608,9 +616,9 @@ int getBlocks(char *file){
             }
         }
     }
+    close(fd);
     
     blocks = (line/4);
-    fclose(inptr);
     
     return blocks;
 }
@@ -621,7 +629,6 @@ int getBlocks(char *file){
 // Counts the spaces, to pass the information to the "tetrimino" function
 void identify(char *file, int *tetriminos){
     
-    char c;
     int pos = 0;
     int space = 0;
     int spacings[3];
@@ -629,15 +636,15 @@ void identify(char *file, int *tetriminos){
     int a = 0;
     int b = 0;
     int dotCount = 0;
+    char chr;
     
-    FILE *inptr_new = fopen(file, "rt");
+    int fd_new = open(file, O_RDONLY);
     
     // Pass the information about the single blocks to the identifier funciton
-    while((c=fgetc(inptr_new))!=EOF){
-        
-        if(b == 2 && c != '\n'){
-            printf("Invalid file! ");
-            abort();
+    while (read(fd_new, &chr, 1) == 1) { 
+        if(b == 2 && chr != '\n'){
+            write(1, "Invalid file\n", 14);
+            exit(0);
         }
         if(b == 2){
             b = 0;
@@ -645,7 +652,7 @@ void identify(char *file, int *tetriminos){
         if(b == 1){
             b++;
         }
-        if(c == '#'){
+        if(chr == '#'){
             if(a != 0){
                 spacings[a - 1] = space;
             }
@@ -653,23 +660,23 @@ void identify(char *file, int *tetriminos){
             space = 0;
             pos++;
         }
-        if(c == '.'){
+        if(chr == '.'){
             space++;
             pos++;
             dotCount++;
         }
-        if(c != '#' && c != '.' && c != '\n'){
-            printf("Invalid file! ");
-            abort();
+        if(chr != '#' && chr != '.' && chr != '\n'){
+            write(1, "Invalid file\n", 14);
+            exit(0);
         }
-        if(c != '#' && c != '.'){
+        if(chr != '#' && chr != '.'){
             continue;
         }
             
         if(pos != 0 && pos % 16 == 0){
             if(a != 4 || dotCount != 12){
-                printf("Invalid file! ");
-                abort();
+                write(1, "Invalid file\n", 14);
+                exit(0);
             }
             tetriminos[number] = tetrimino(spacings);
             number++;
@@ -678,8 +685,7 @@ void identify(char *file, int *tetriminos){
             b = 1;
         }
     }
-    
-    fclose(inptr_new);
+    close(fd_new);
 }
 
 //***************************************************************************************************************
@@ -707,8 +713,9 @@ void printMap(int mapSize, char map[][mapSize]){
     for(m = 0; m < mapSize; m++){
         int n;
         for(n = 0; n < mapSize; n++){
-            printf("%c", map[m][n]);
+            char* a = &map[m][n];
+            write(1, a, 1);
         }
-        printf("\n");
+        write(1, "\n", 2);
     }
 }
