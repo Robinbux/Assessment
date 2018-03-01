@@ -1,1 +1,2 @@
-Places tetriminos into the smallest square possible.
+My attempt for the 42 challange "fillit".
+My program places tetriminos into the smallest square possible.
