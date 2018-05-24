@@ -1,2 +1,2 @@
-My attempt for the 42 challenge "fillit".
-My program places tetriminos into the smallest square possible.
+My assessment for SE_01 SS 2018.
+Usage: ./fillit [file]
