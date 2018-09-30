@@ -29,9 +29,9 @@ The task was to create a program, that takes a text file containing tetris piece
 
 After that, it should arrange them into the smalles sqqare possible, for example in this case:
 
-DDAA
-CDDA
-CCCA
-BBBB
+DDAA<br/>
+CDDA<br/>
+CCCA<br/>
+BBBB<br/>
 
 Usage: ./fillit [file]
