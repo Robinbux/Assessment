@@ -1,4 +1,4 @@
-#42 Fillit
+# 42 Fillit
 
 My assesment for the Fillit challenge of 42, Silicon Valley.
 This challenge was haded to us, by the CODE University of applied sciences, Berlin.
@@ -33,6 +33,7 @@ After that, it should arrange them into the smalles sqqare possible, for example
 DDAA
 CDDA
 CCCA
-BBBB**
+BBBB
+**
 
 Usage: ./fillit [file]
